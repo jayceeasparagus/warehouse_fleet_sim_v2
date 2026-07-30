@@ -23,7 +23,8 @@ setup(
         ],
     },
     entry_points={
-        'console_scripts': [
+    'console_scripts': [
+        'layout_loader_node = fleet_core.layout_loader_node:main',
         ],
     },
 )
