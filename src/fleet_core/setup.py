@@ -26,7 +26,7 @@ setup(
     },
     entry_points={
     'console_scripts': [
-        'layout_loader_node = fleet_core.layout_loader_node:main',
+        'layout_loader_node = fleet_core.layout_loader_node:main', 'map_builder_node = fleet_core.map_builder_node:main',
         ],
     },
 )
