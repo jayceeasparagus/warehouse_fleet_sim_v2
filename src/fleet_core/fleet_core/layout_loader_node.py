@@ -44,8 +44,18 @@ def validate_layout(layout):
             return False, f'duplicate shelf id: {shelf["id"]}'
 
         shelf_ids.add(shelf['id'])
+        
+        for field in ['width', 'depth', 'height']:
+            if field not in shelf:
+                raise ValueError(f"Shelf {shelf.get('id', '?')} is missing '{field}'")
 
-    station_ids = set()
+        if shelf['width'] <= 0 or shelf['depth'] <= 0:
+            raise ValueError(f"Shelf {shelf['id']} width and depth must be positive")
+
+        if shelf['height'] <= 0:
+            raise ValueError(f"Shelf {shelf['id']} height must be positive")
+
+        station_ids = set()
 
     for station in layout['stations']:
         valid, message = validate_named_pose(station, 'station', grid)

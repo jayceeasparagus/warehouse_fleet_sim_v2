@@ -6,19 +6,19 @@
     "resolution": 0.5
   },
   "shelves": [
-    {"id": "A1", "x": 3, "y": 2, "yaw": 0},
-    {"id": "A2", "x": 3, "y": 5, "yaw": 0},
-    {"id": "B1", "x": 8, "y": 2, "yaw": 3.14},
-    {"id": "B2", "x": 8, "y": 5, "yaw": 3.14}
+    {"id": "A1", "x": 3, "y": 2, "yaw": 0.0, "width": 1, "depth": 2, "height": 1.2},
+    {"id": "A2", "x": 3, "y": 5, "yaw": 0.0, "width": 1, "depth": 2, "height": 1.2},
+    {"id": "B1", "x": 8, "y": 2, "yaw": 3.14, "width": 1, "depth": 2, "height": 1.2},
+    {"id": "B2", "x": 8, "y": 5, "yaw": 3.14, "width": 1, "depth": 2, "height": 1.2}
   ],
   "stations": [
     {"id": "A1", "x": 2.5, "y": 2, "yaw": 3.14},
     {"id": "A2", "x": 2.5, "y": 5, "yaw": 3.14},
-    {"id": "B1", "x": 8.5, "y": 2, "yaw": 0},
-    {"id": "B2", "x": 8.5, "y": 5, "yaw": 0}
+    {"id": "B1", "x": 8.5, "y": 2, "yaw": 0.0},
+    {"id": "B2", "x": 8.5, "y": 5, "yaw": 0.0}
   ],
   "robot_spawns": [
-    {"name": "robot1", "x": 1, "y": 1, "yaw": 0},
-    {"name": "robot2", "x": 1, "y": 7, "yaw": 0}
+    {"name": "robot1", "x": 1, "y": 1, "yaw": 0.0},
+    {"name": "robot2", "x": 1, "y": 7, "yaw": 0.0}
   ]
 }
