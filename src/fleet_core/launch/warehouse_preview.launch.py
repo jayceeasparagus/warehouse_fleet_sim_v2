@@ -1,7 +1,8 @@
+import os
 from pathlib import Path
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, TimerAction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
@@ -19,13 +20,40 @@ def generate_launch_description():
         / 'generated_maps'
         / 'basic_warehouse_map.yaml'
     )
+    default_layout = (
+        workspace
+        / 'src'
+        / 'fleet_core'
+        / 'layouts'
+        / 'basic_warehouse.json'
+    )
 
     world_file = LaunchConfiguration('world_file')
     map_file = LaunchConfiguration('map_file')
+    layout_file = LaunchConfiguration('layout_file')
+    world_name = LaunchConfiguration('world_name')
+
+    turtlebot_models = Path(
+        '/opt/ros/jazzy/share/turtlebot3_gazebo/models'
+    )
+    existing_resource_path = os.environ.get(
+        'GZ_SIM_RESOURCE_PATH',
+        '',
+    )
+
+    if existing_resource_path:
+        gazebo_resource_path = (
+            f'{turtlebot_models}:{existing_resource_path}'
+        )
+    else:
+        gazebo_resource_path = str(turtlebot_models)
 
     gazebo = ExecuteProcess(
         cmd=['gz', 'sim', '-r', world_file],
         output='screen',
+        additional_env={
+            'GZ_SIM_RESOURCE_PATH': gazebo_resource_path,
+        },
     )
 
     map_server = Node(
@@ -63,6 +91,24 @@ def generate_launch_description():
         parameters=[{'use_sim_time': False}],
     )
 
+    robot_spawner = TimerAction(
+        period=5.0,
+        actions=[
+            Node(
+                package='fleet_core',
+                executable='robot_spawner_node',
+                name='robot_spawner_node',
+                output='screen',
+                parameters=[
+                    {
+                        'layout_file': layout_file,
+                        'world_name': world_name,
+                    }
+                ],
+            )
+        ],
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'world_file',
@@ -72,8 +118,17 @@ def generate_launch_description():
             'map_file',
             default_value=str(default_map),
         ),
+        DeclareLaunchArgument(
+            'layout_file',
+            default_value=str(default_layout),
+        ),
+        DeclareLaunchArgument(
+            'world_name',
+            default_value='basic_warehouse',
+        ),
         gazebo,
         map_server,
         lifecycle_manager,
         rviz,
+        robot_spawner,
     ])

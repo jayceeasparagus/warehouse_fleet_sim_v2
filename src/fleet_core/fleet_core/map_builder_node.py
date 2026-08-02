@@ -6,7 +6,7 @@ import rclpy
 from ament_index_python.packages import get_package_share_directory
 from rclpy.node import Node
 
-from fleet_core.layout_loader_node import validate_layout
+from fleet_core.layout_loader_node import prepare_layout, validate_layout
 
 
 FREE = 254
@@ -168,6 +168,8 @@ class MapBuilderNode(Node):
 
         with layout_path.open('r') as file:
             layout = json.load(file)
+
+        layout = prepare_layout(layout)
 
         valid, message = validate_layout(layout)
 

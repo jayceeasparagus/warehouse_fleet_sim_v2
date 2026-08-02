@@ -29,7 +29,7 @@ setup(
     },
     entry_points={
     'console_scripts': [
-        'layout_loader_node = fleet_core.layout_loader_node:main', 'map_builder_node = fleet_core.map_builder_node:main', 'world_builder_node = fleet_core.world_builder_node:main',
+        'layout_loader_node = fleet_core.layout_loader_node:main', 'map_builder_node = fleet_core.map_builder_node:main', 'world_builder_node = fleet_core.world_builder_node:main', 'robot_spawner_node = fleet_core.robot_spawner_node:main',
         ],
     },
 )
