@@ -1,4 +1,5 @@
 import json
+import math
 from pathlib import Path
 
 import rclpy
@@ -12,15 +13,53 @@ FREE = 254
 OCCUPIED = 0
 
 
-def fill_square(pixels, center_x, center_y, size):
-    height = len(pixels)
-    width = len(pixels[0])
-    half_size = size // 2
+def fill_rotated_rectangle(
+    pixels,
+    center_x,
+    center_y,
+    width_meters,
+    depth_meters,
+    yaw,
+    map_resolution,
+):
+    image_height = len(pixels)
+    image_width = len(pixels[0])
 
-    for pixel_y in range(center_y - half_size, center_y + half_size + 1):
-        for pixel_x in range(center_x - half_size, center_x + half_size + 1):
-            if 0 <= pixel_x < width and 0 <= pixel_y < height:
-                image_row = height - 1 - pixel_y
+    half_width = width_meters / 2
+    half_depth = depth_meters / 2
+
+    search_radius = math.ceil(
+        math.hypot(half_width, half_depth) / map_resolution
+    )
+
+    cosine = math.cos(yaw)
+    sine = math.sin(yaw)
+
+    for pixel_y in range(
+        center_y - search_radius,
+        center_y + search_radius + 1,
+    ):
+        for pixel_x in range(
+            center_x - search_radius,
+            center_x + search_radius + 1,
+        ):
+            if not (
+                0 <= pixel_x < image_width
+                and 0 <= pixel_y < image_height
+            ):
+                continue
+
+            offset_x = (pixel_x - center_x) * map_resolution
+            offset_y = (pixel_y - center_y) * map_resolution
+
+            local_x = cosine * offset_x + sine * offset_y
+            local_y = -sine * offset_x + cosine * offset_y
+
+            if (
+                abs(local_x) <= half_width
+                and abs(local_y) <= half_depth
+            ):
+                image_row = image_height - 1 - pixel_y
                 pixels[image_row][pixel_x] = OCCUPIED
 
 
@@ -52,8 +91,6 @@ def create_map(layout, map_resolution):
             row[column] = OCCUPIED
             row[pixel_width - 1 - column] = OCCUPIED
 
-    shelf_size = max(1, round(grid_resolution / map_resolution))
-
     for shelf in layout['shelves']:
         center_x = round(
             shelf['x'] * grid_resolution / map_resolution
@@ -62,11 +99,17 @@ def create_map(layout, map_resolution):
             shelf['y'] * grid_resolution / map_resolution
         )
 
-        fill_square(
-            pixels,
-            center_x,
-            center_y,
-            shelf_size,
+        width_meters = shelf['width'] * grid_resolution
+        depth_meters = shelf['depth'] * grid_resolution
+
+        fill_rotated_rectangle(
+            pixels=pixels,
+            center_x=center_x,
+            center_y=center_y,
+            width_meters=width_meters,
+            depth_meters=depth_meters,
+            yaw=shelf['yaw'],
+            map_resolution=map_resolution,
         )
 
     origin_x = -map_width_meters / 2
